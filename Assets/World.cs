@@ -31,19 +31,23 @@ public class World : MonoBehaviour
         GameObject GameObject = new GameObject();
         GameObject.transform.position = a.ToVector3();
         SpriteRenderer SpriteRenderer = GameObject.AddComponent<SpriteRenderer>();
-        SpriteRenderer.sprite = main.Square;
-        SpriteRenderer.color = Color.black;
         Spot Spot = GameObject.AddComponent<Spot>();
         Spot.spriteRenderer = SpriteRenderer;
+        Spot.SetColor(cBlock);
         return Spot;
     }
 #nullable disable
     public Sprite Square;
     public Sprite Triangle;
+    public Sprite Background;
     public static World main;
     public static Point start;
     public static Point end;
     public static List<Point> path = new List<Point>();
+    public static Color cBlock = Color.black;
+    public static Color cClear = Color.red;
+    public static Color cStart = Color.green;
+    public static Color cEnd = Color.cyan;
     void Start()
     {
         if (main != null)
@@ -68,14 +72,14 @@ public class World : MonoBehaviour
             switch (x)
             {
                 case -1:
-                    current.SetColor(Color.red);
+                    current.SetColor(cStart);
                     start = here;
                     break;
                 case 0:
-                    current.SetColor(Color.grey);
+                    current.SetColor(cClear);
                     break;
                 case 1:
-                    current.SetColor(Color.cyan);
+                    current.SetColor(cEnd);
                     end = here;
                     break;
             }
@@ -106,8 +110,8 @@ public class World : MonoBehaviour
                         MapAdd(point + (x, y));
                     }
                 }
-                MapGet(start).SetColor(Color.grey);
-                MapGet(point).SetColor(Color.red);
+                MapGet(start).SetColor(cClear);
+                MapGet(point).SetColor(cStart);
                 start = point;
                 path.Insert(0, point);
             }
@@ -116,12 +120,12 @@ public class World : MonoBehaviour
                 if (a.X == start.X)
                 {
                     if(a.Y.InRange(start.Y - 1, start.Y + 1))
-                        return MapGet(a).spriteRenderer.color != Color.grey;
+                        return MapGet(a).spriteRenderer.color != cClear;
                 }
                 else if (a.Y == start.Y)
                 {
                     if(a.X.InRange(start.X - 1, start.X + 1))
-                        return MapGet(a).spriteRenderer.color != Color.grey;
+                        return MapGet(a).spriteRenderer.color != cClear;
                 }
                 return false;
             }
@@ -133,17 +137,24 @@ public class Spot : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public void SetColor(Color color)
     {
-        if (color == Color.black)
-            gameObject.AddComponent<PolygonCollider2D>();
+        if (color == World.cClear)
+            spriteRenderer.sprite = World.main.Background;
         else
-            Destroy(gameObject.GetComponent<PolygonCollider2D>());
+            spriteRenderer.sprite = World.main.Square;
+
+        if (color == World.cBlock)
+            gameObject.AddComponent<BoxCollider2D>();
+        else
+        {
+            Debug.Log($"Destory {this.ToString()}");
+            Destroy(gameObject.GetComponent<BoxCollider2D>());
+        }
+
         spriteRenderer.color = color;
     }
     public void Start()
     {
         gameObject.name = ((Point)transform.position).ToString();
-        if (spriteRenderer.color == Color.black)
-            gameObject.AddComponent<PolygonCollider2D>();
     }
     public override string ToString()
     {
