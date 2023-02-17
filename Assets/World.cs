@@ -14,16 +14,16 @@ public class World : MonoBehaviour
             return Map[a];
         return null;
     }
-    public static bool MapAdd(int x, int y)
+    public static Spot? MapAdd(int x, int y)
     {
         return MapAdd(new Point(x, y));
     }
-    public static bool MapAdd(Point a)
+    public static Spot? MapAdd(Point a)
     {
         if (Map.ContainsKey(a))
-            return false;
+            return null;
         Map.Add(a, SpotConstructor(a));
-        return true;
+        return Map[a];
     }
     public static Spot SpotConstructor(Point a)
     {
@@ -37,8 +37,11 @@ public class World : MonoBehaviour
         return Spot;
     }
 #nullable disable
-    public static World main;
     public Sprite Square;
+    public static World main;
+    public static Point start;
+    public static Point end;
+    public static List<Point> path = new List<Point>();
     void Start()
     {
         if (main != null)
@@ -55,45 +58,58 @@ public class World : MonoBehaviour
         for(int x = -1; x <= 1; x++)
         {
             const int y = 0;
+            Point here = new Point(x, y);
             Spot current = MapGet(x, y);
             if (current == null)
                 continue;
-            current.spriteRenderer.color = Color.white;
+            path.Add(here);
+            switch (x)
+            {
+                case -1:
+                    current.spriteRenderer.color = Color.red;
+                    start = here;
+                    break;
+                case 0:
+                    current.spriteRenderer.color = Color.white;
+                    break;
+                case 1:
+                    current.spriteRenderer.color = Color.cyan;
+                    end = here;
+                    break;
+            }
         }
     }
-}
-public class Point
-{
-    public int Y;
-    public int X;
-    public Point(int x, int y)
-    {
-        X = x;
-        Y = y;
-    }
-    public Vector3 ToVector3()
-    {
-        return new Vector3(X, Y, 0);
-    }
-    public Vector2 ToVector2()
-    {
-        return new Vector2(X, Y);
-    }
-    public override int GetHashCode()
-    {
-        return X.GetHashCode() ^ Y.GetHashCode();
-    }
-    public bool Equals(Point point)
-    {
-        return point.X == X && point.Y == Y;
-    }
 
-    public override bool Equals(object o)
+    private void Update()
     {
-        return this.Equals(o as Point);
+        if (Input.GetMouseButtonDown(0))
+        {
+            Point point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            for(int x = -1; x <= 1; x++)
+            {
+                for(int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0)
+                        continue;
+                    MapAdd(point + (x, y));
+                }
+            }
+            MapGet(start).spriteRenderer.color = Color.white;
+            MapGet(point).spriteRenderer.color = Color.red;
+            start = point;
+            path.Insert(0, point);
+        }
     }
 }
 public class Spot : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
+    public void Start()
+    {
+        gameObject.name = ((Point)transform.position).ToString();
+    }
+    public override string ToString()
+    {
+        return $"This Spot {transform.position.ToString()}";
+    }
 }
