@@ -20,6 +20,14 @@ public class Point
     {
         return $"Point({X},{Y})";
     }
+    public static implicit operator Vector3(Point a)
+    {
+        return new Vector3(a.X, a.Y);
+    }
+    public static implicit operator Vector2(Point a)
+    {
+        return new Vector2(a.X, a.Y);
+    }
     public static implicit operator Point(Vector3 a)
     {
         return new Point(Mathf.RoundToInt(a.x), Mathf.RoundToInt(a.y));

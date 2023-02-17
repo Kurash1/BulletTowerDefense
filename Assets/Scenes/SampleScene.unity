@@ -248,7 +248,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5710a3ca2742a843a609a667c0ef540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Square: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+  Square: {fileID: 21300000, guid: 5f7128737ec199d4785980a98fa15e22, type: 3}
+  Triangle: {fileID: 21300000, guid: bc92409cebb16f14f80399c957fd5652, type: 3}
 --- !u!4 &2071329639
 Transform:
   m_ObjectHideFlags: 0
