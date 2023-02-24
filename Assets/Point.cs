@@ -8,6 +8,11 @@ public class Point
         X = x;
         Y = y;
     }
+    public Point(Point a)
+    {
+        X = a.X;
+        Y = a.Y;
+    }
     public static Point operator +(Point a, Point b)
     {
         return new Point(a.X + b.X, a.Y + b.Y);

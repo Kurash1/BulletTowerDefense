@@ -36,9 +36,9 @@ class PathFollower : MonoBehaviour
     private void NextDestination()
     {
         Destination++;
-        if (Destination == World.path.Count)
+        if (Destination == World.OptimalPath.Count)
             Destroy(gameObject);
         else
-            pDestination = World.path[Destination];
+            pDestination = World.OptimalPath[Destination];
     }
 }
