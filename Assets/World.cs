@@ -38,6 +38,7 @@ public class World : MonoBehaviour
         Spot Spot = GameObject.AddComponent<Spot>();
         Spot.spriteRenderer = SpriteRenderer;
         Spot.SetColor(cBlock);
+        GameObject.tag = "Enemy";
         return Spot;
     }
 #nullable disable
@@ -53,6 +54,8 @@ public class World : MonoBehaviour
     public static Color cClear = Color.red;
     public static Color cStart = Color.green;
     public static Color cEnd = Color.cyan;
+    public static bool game = false;
+    public int damage = 0;
     void Start()
     {
         if (main != null)
@@ -93,7 +96,8 @@ public class World : MonoBehaviour
     }
     private void OptimizePath()
     {
-        OptimalPath = FindOptimalPath();
+        OptimalPath = Path;
+        //OptimalPath = FindOptimalPath();
     }
     private static List<Point> FindOptimalPath()
     {
@@ -181,18 +185,26 @@ public class World : MonoBehaviour
         int dy = Mathf.Abs(a.Y - b.Y);
         return dx + dy;
     }
-
+    public int enemy = 0;
     private void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(2))
         {
-            for (int i = 0; i < 10; i++)
-            {
-                GameObject @object = new GameObject();
-                @object.AddComponent<PathFollower>();
-            }
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    GameObject @object = new GameObject();
+            //    @object.AddComponent<PathFollower>();
+            //}
+            game = true;
+            enemy += 100;
         }
-        if (Input.GetMouseButtonDown(0))
+        if(enemy > 0 && Physics2D.BoxCastAll(Path[0],new Vector2(0.5f, 0.5f), 0, Vector2.zero).Count() < 1)
+        {
+            //enemy--;
+            GameObject @object = new GameObject();
+            @object.AddComponent<PathFollower>();
+        }
+        if (Input.GetMouseButtonDown(1))
         {
             Point point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if (valid(point))
@@ -211,21 +223,40 @@ public class World : MonoBehaviour
                 start = point;
                 Path.Insert(0, point);
                 OptimizePath();
+                PathFollower[] c = GameObject.FindObjectsOfType<PathFollower>();
+                //Debug.Log(c.Length);
+                for (int i = 0; i < c.Length; i++)
+                {
+                    c[i].NextDestination();
+                }
             }
             static bool valid(Point a)
             {
                 if (a.X == start.X)
                 {
-                    if(a.Y.InRange(start.Y - 1, start.Y + 1))
-                        if(GetNeighbors(a).Count == 1)
+                    if (a.Y.InRange(start.Y - 1, start.Y + 1))
+                        if (GetNeighbors(a).Count == 1)
                             return MapGet(a).spriteRenderer.color != cClear;
                 }
                 else if (a.Y == start.Y)
                 {
-                    if(a.X.InRange(start.X - 1, start.X + 1))
+                    if (a.X.InRange(start.X - 1, start.X + 1))
                         if (GetNeighbors(a).Count == 1)
                             return MapGet(a).spriteRenderer.color != cClear;
                 }
+                return false;
+            }
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Point point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (valid(point))
+            {
+                
+            }
+            static bool valid(Point a)
+            {
+
                 return false;
             }
         }

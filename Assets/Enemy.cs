@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 class PathFollower : MonoBehaviour
 {
     int Destination = 0;
     public Point pDestination;
+    Point last;
     Rigidbody2D body;
     SpriteRenderer render;
     float movespeed = 100f;
@@ -25,19 +27,25 @@ class PathFollower : MonoBehaviour
         transform.localScale = new Vector3(0.2f, 0.2f, 1);
         NextDestination();
         transform.up = pDestination - transform.position;
+        last = World.OptimalPath.Last();
     }
     private void FixedUpdate()
     {
         transform.up = pDestination - transform.position;
-        if (Vector2.Distance(transform.position, pDestination) < 0.5f)
+        if (Vector2.Distance(transform.position, pDestination) < 1f)
             NextDestination();
+        if (Vector2.Distance(transform.position, last) < 0.5f)
+        {
+            World.main.damage++;
+            Destroy(gameObject);
+        }
         body.AddForce(transform.up * movespeed * Time.deltaTime);
     }
-    private void NextDestination()
+    public void NextDestination()
     {
         Destination++;
-        if (Destination == World.OptimalPath.Count)
-            Destroy(gameObject);
+        if (Destination >= World.OptimalPath.Count)
+            pDestination = last;
         else
             pDestination = World.OptimalPath[Destination];
     }
