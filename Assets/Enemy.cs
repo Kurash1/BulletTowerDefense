@@ -32,7 +32,7 @@ class PathFollower : MonoBehaviour
     private void FixedUpdate()
     {
         transform.up = pDestination - transform.position;
-        if (Vector2.Distance(transform.position, pDestination) < 1f)
+        if (Vector2.Distance(transform.position, pDestination) < 0.75f)
             NextDestination();
         if (Vector2.Distance(transform.position, last) < 0.5f)
         {
